@@ -9,9 +9,14 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <cstring>
+#include <unordered_map>
 #include "headher.h"
 
 using namespace std;
+
+unordered_map<string, string> users;
+mutex user_mutex;
+
 
 void handle_client(int client_sock, string client_ip, int client_port) {
     char buffer[1024];
@@ -23,7 +28,26 @@ void handle_client(int client_sock, string client_ip, int client_port) {
             close(client_sock);
             break;
         }
-        cout << "[Message from " << client_ip << ":" << client_port << "] " << buffer << endl;
+        // cout << "[Message from " << client_ip << ":" << client_port << "] " << buffer << endl;
+
+        string command(buffer);
+        istringstream iss(command);
+        string cmd, user_id, password;
+        iss >> cmd >> user_id >> password;
+
+        if (cmd == "create_user") {
+            lock_guard<mutex> lock(user_mutex);
+
+            if (users.find(user_id) != users.end()) {
+                string msg = "User already exists\n";
+                send(client_sock, msg.c_str(), msg.size(), 0);
+            } else {
+                users[user_id] = password;
+                string msg = "User created successfully\n";
+                send(client_sock, msg.c_str(), msg.size(), 0);
+            }
+        }
+
     }
 }
 
