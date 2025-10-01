@@ -27,7 +27,12 @@ pair<string, int> read_info(const string &filename, int n) {
 
     // Tokenize lines by "\n"
     char *line = strtok(buffer, "\n");
-    int i = 1;
+    // line = strtok(NULL, "\n"); // this overwrites second line, so only second ip:port pair is process here
+
+    // below code will run till n, so at end line will contain ip:port pair at nth line, 
+    // since we keep looping , all lines before it are overwritten, see connect_loop function, two calls are made with
+    // n = 1 and n = 2 
+    int i = 1;   
     while (line && i < n) {
         line = strtok(NULL, "\n");  // move to next line
         i++;

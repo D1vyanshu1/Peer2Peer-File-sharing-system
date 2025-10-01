@@ -6,11 +6,11 @@ CXXFLAGS = -Wall -pthread -std=c++11
 TARGET = tracker
 
 # Source and object files
-SRCS = main.cpp fetchIP_Port.cpp
+SRCS = main.cpp fetchIP_Port.cpp callFunction.cpp executeFunctions.cpp peerSync.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Header files
-HEADERS = headher.h
+HEADERS = theadher.h
 
 # Default rule
 all: $(TARGET)

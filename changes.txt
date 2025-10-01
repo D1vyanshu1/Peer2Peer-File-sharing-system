@@ -1,0 +1,5 @@
+1. on client side , right now default ip:port is picked for client, i have to make it be the one i give in command
+   when turning on the client ie ./client ip:port info.txt   (ip:port) in command should be used for client
+
+2. on tracker side , store client ip and port along with username and password
+

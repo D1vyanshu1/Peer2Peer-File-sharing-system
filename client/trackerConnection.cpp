@@ -6,43 +6,62 @@
 #include <sys/socket.h>
 #include <cstring>
 #include <cerrno>
-#include "headher.h"  // contains read_info()
+#include "cheadher.h"  // contains read_info()
 
 using namespace std;
 
-int connect_to_tracker(const string &ip, int port) {
+int connect_to_tracker(const string &ip, int tracker_port) {
 
     // first create a socket
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
+    int client_sock = socket(AF_INET, SOCK_STREAM, 0);
+    if(client_sock < 0) {
         perror("socket");
         return -1;
     }
 
 // use struct to store ip addr, port and ip type
-    sockaddr_in tracker_addr;
+    sockaddr_in tracker_addr, client_addr;
+
+    // // Bind socket to given client ip:port
+    // memset(&client_addr, 0, sizeof(client_addr));
+    // client_addr.sin_family = AF_INET;
+    // client_addr.sin_port = htons(client_port);
+
+    // if (inet_pton(AF_INET, client_ip.c_str(), &client_addr.sin_addr) <= 0) {
+    //     cerr << "Invalid client IP address\n";
+    //     close(client_sock);
+    //     return -1;
+    // }
+
+    // if (bind(client_sock, (struct sockaddr*)&client_addr, sizeof(client_addr)) < 0) {
+    //     perror("Client bind failed");
+    //     close(client_sock);
+    //     return -1;
+    // }
+
     memset(&tracker_addr, 0, sizeof(tracker_addr));
     tracker_addr.sin_family = AF_INET;
-    tracker_addr.sin_port = htons(port);
+    tracker_addr.sin_port = htons(tracker_port);
 
-    if (inet_pton(AF_INET, ip.c_str(), &tracker_addr.sin_addr) <= 0) {
+    if(inet_pton(AF_INET, ip.c_str(), &tracker_addr.sin_addr) <= 0) {
         cerr << "Invalid IP address: " << ip << endl;
-        close(sock);
+        close(client_sock);
         return -1;
     }
-
-    if (connect(sock, (sockaddr*)&tracker_addr, sizeof(tracker_addr)) < 0) {
-        close(sock);
+    
+    // trying to establish tcp connection, if fail then return error after closing socket of client we opened
+    if(connect(client_sock, (sockaddr*)&tracker_addr, sizeof(tracker_addr)) < 0) {
+        close(client_sock);
         return -1;  // fail
     }
 
-    return sock; // success
+    return client_sock; // success
 }
 
 
 int connect_loop(const string &filepath) {
     int sock = -1;
-    while (true) {
+    while(true){
         // Try Tracker 1
         auto [ip1, port1] = read_info(filepath, 1);
         sock = connect_to_tracker(ip1, port1);
@@ -54,12 +73,12 @@ int connect_loop(const string &filepath) {
         // Try Tracker 2
         auto [ip2, port2] = read_info(filepath, 2);
         sock = connect_to_tracker(ip2, port2);
-        if (sock >= 0) {
+        if(sock >= 0) {
             cout << "[*] Connected to Tracker 2 at " << ip2 << ":" << port2 << endl;
             return sock;
         }
 
-        cout << "[!] Both trackers unavailable, retrying in 2 seconds..." << endl;
-        sleep(2);
+        cout << "[!] Both trackers unavailable, retrying again in 10 seconds..." << endl;
+        sleep(10);
     }
 }

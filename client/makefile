@@ -6,18 +6,22 @@ CXXFLAGS = -Wall -pthread -std=c++11
 TARGET = client
 
 # Source and object files
-SRCS = main.cpp fetchIP.cpp trackerConnection.cpp
+SRCS = main.cpp fetchIP.cpp trackerConnection.cpp upload_file.cpp downloadChunk.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 # Header files
-HEADERS = headher.h
+HEADERS = cheadher.h
 
 # Default rule
 all: $(TARGET)
 
 # Link object files into the final executable
+# Add OpenSSL libs
+LDLIBS = -lcrypto -lssl
+
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDLIBS)
+
 
 # Compile each .cpp into .o
 %.o: %.cpp $(HEADERS)
