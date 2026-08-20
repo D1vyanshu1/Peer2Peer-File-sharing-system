@@ -289,8 +289,4 @@ and documents the trade-offs (all expanded in [`instructions.md`](instructions.m
   later in the same download aren't re-polled).
 - **No transport encryption** yet — the credential hashing protects stored
   passwords, but adding TLS to both planes is a natural extension.
-
-See the "Future work" section of the guide for the full roadmap (TLS, Raft,
-`epoll`, NAT traversal, DHT).
-
 ---
