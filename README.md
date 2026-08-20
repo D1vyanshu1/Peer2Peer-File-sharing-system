@@ -294,7 +294,3 @@ See the "Future work" section of the guide for the full roadmap (TLS, Raft,
 `epoll`, NAT traversal, DHT).
 
 ---
-
-## License
-
-MIT (or your course's required license).
